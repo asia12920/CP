@@ -40,6 +40,11 @@ class BackendGateway {
     {
         return $this->bR->saveUserVacation($request);
     }
+
+    public function saveUserSickleave($request)
+    {
+        return $this->bR->saveUserSickleave($request);
+    }
     
 
 }

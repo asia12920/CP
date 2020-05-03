@@ -49,4 +49,9 @@ class User extends Authenticatable
         return $this->hasMany('App\Vacation'); 
     }
     
+    public function sickleaves()
+    {
+        return $this->hasMany('App\User'); 
+    }
+    
 }

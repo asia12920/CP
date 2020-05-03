@@ -53,8 +53,8 @@ class PlatformController extends Controller
         }
 
 
-
-        return view('workhours',['users'=>$users]);
+        $workers = $this->bR->getUsersForMainPage();
+        return view('workhours',['users'=>$users, 'workers'=>$workers]);
        
 
        
@@ -82,7 +82,10 @@ class PlatformController extends Controller
         ->join('sickleaves', 'sickleaves.user_id', '=', 'users.id')
         ->where('users.email', '=', $request->input('search') )
         ->select('users.email', 'sickleaves.date')->get();
-        return view('sickleaves',['users'=>$users]);
+
+        $workers = $this->bR->getUsersForMainPage();
+
+        return view('sickleaves',['users'=>$users, 'workers'=>$workers]);
     }
 
     public function searchvacation(Request $request)
@@ -100,6 +103,13 @@ class PlatformController extends Controller
             ->whereDate('vacations.date','<=' , $dayout)
             ->orderBy('vacations.date', 'desc')
             ->select('users.email','vacations.user_id', 'vacations.date')->get();
+
+            $vacations = DB::table('users')
+            ->join('hours', 'hours.user_id', '=', 'users.id')
+            ->where('users.email', '=', $request->input('search'))
+            ->whereDate('hours.date','>=' , $dayin)
+            ->whereDate('hours.date','<=' , $dayout)
+            ->select('users.email','hours.user_id', 'hours.date', 'hours.hours')->get();
         }
         else {
             $users = DB::table('users')
@@ -107,24 +117,36 @@ class PlatformController extends Controller
             ->where('users.email', '=', $request->input('search'))
             ->orderBy('vacations.date', 'desc')
             ->select('users.email','vacations.user_id', 'vacations.date')->get();
+
+            $vacations = DB::table('users')
+            ->join('hours', 'hours.user_id', '=', 'users.id')
+            ->where('users.email', '=', $request->input('search'))
+            ->select('users.email','hours.user_id', 'hours.date', 'hours.hours')->get();
         }
 
 
    
-        $vacations = DB::table('users')
-        ->join('hours', 'hours.user_id', '=', 'users.id')
-        ->where('users.email', '=', $request->input('search'))
-        ->select('users.email','hours.user_id', 'hours.date', 'hours.hours')->get();
 
-        return view('vacation',['users'=>$users, 'vacations'=>$vacations]);
+
+
+        $workers = $this->bR->getUsersForMainPage();
+
+        return view('vacation',['users'=>$users, 'vacations'=>$vacations, 'workers'=>$workers]);
      
     }
 
     public function insertVacation(Request $request)
     {
         $user = $this->bG->saveUserVacation($request);
-
+        
         return redirect('/admin/vacation')->with('vacation', __('Urlop został dodany do bazy'));
+    }
+
+    public function insertSickleave (Request $request)
+    {
+        $user = $this->bG->saveUserSickleave($request);
+        
+        return redirect('/admin/sickleaves')->with('sickleave', __('Zwolnienie lekarskie zostało wprowadzone poprawnie'));
     }
 
     public function welcome()

@@ -2,7 +2,7 @@
 namespace App\CP\Repositories; /* Lecture 12 */
 use App\CP\Interfaces\BackendRepositoryInterface;
 
-use App\{User, Hour, Vacation}; /* Lecture 12 */
+use App\{User, Hour, Vacation, Sickleave}; /* Lecture 12 */
 use GuzzleHttp\Psr7\Request;
 
 class BackendRepository implements BackendRepositoryInterface {
@@ -43,7 +43,18 @@ class BackendRepository implements BackendRepositoryInterface {
         $user = new Vacation;
         $user->user_id = $request->input('email') ;
         $user->date = $request->input('date');
-        $user->status = 0;
+        //$user->status = 0;
+        $user->save();
+
+        return $user;
+    }
+
+    public function saveUserSickleave($request)
+    {
+        $user = new Sickleave;
+        $user->user_id = $request->input('email') ;
+        $user->date = $request->input('date');
+        //$user->status = 0;
         $user->save();
 
         return $user;
